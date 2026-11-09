@@ -1,0 +1,815 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Onboarding Desk</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=DM+Mono:wght@400;500&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a processing desk. Ink-on-white form language: hairlines, square corners, mono data, stamped verdicts.
+   Run = intake form left, stage ledger right. Status colours are stamp inks only; everything else is ink. */
+:root{
+  --bg:#FFFFFF; --surface:#FFFFFF; --surface-2:#F4F5F3; --ink:#0F1317; --muted:#59605C; --line:#D3D7D1;
+  --accent:#0F1317; --accent-ink:#FFFFFF; --accent-soft:#E7E9E4;
+  --good:#0E6B3A; --good-bg:#E3F1E8; --warn:#B25400; --warn-bg:#FCEBD6; --bad:#B01E18; --bad-bg:#FADEDB; --info:#4A524E; --info-bg:#ECEEEA;
+  --font:'Public Sans',system-ui,-apple-system,'Segoe UI',sans-serif; --head:'Archivo','Public Sans',system-ui,sans-serif; --mono:'DM Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1210; --surface:#141917; --surface-2:#1B211E; --ink:#ECEFEA; --muted:#98A19B; --line:#2C3430;
+  --accent:#ECEFEA; --accent-ink:#0E1210; --accent-soft:#232A26;
+  --good:#58C98B; --good-bg:#12291D; --warn:#F0A04B; --warn-bg:#33230F; --bad:#F27B72; --bad-bg:#371816; --info:#A8B1AB; --info-bg:#222925; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1210; --surface:#141917; --surface-2:#1B211E; --ink:#ECEFEA; --muted:#98A19B; --line:#2C3430;
+  --accent:#ECEFEA; --accent-ink:#0E1210; --accent-soft:#232A26;
+  --good:#58C98B; --good-bg:#12291D; --warn:#F0A04B; --warn-bg:#33230F; --bad:#F27B72; --bad-bg:#371816; --info:#A8B1AB; --info-bg:#222925; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:14px/1.5 var(--font);margin:0}
+button,input,textarea,select{font:inherit;color:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top{background:var(--bg);border-bottom:2px solid var(--ink);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.top .wrap{display:flex;align-items:flex-end;gap:28px;flex-wrap:wrap;padding-top:12px}
+.brand{font:700 15px var(--head);letter-spacing:.14em;text-transform:uppercase;padding-bottom:10px;white-space:nowrap}
+.brand small{display:block;font:400 11px var(--mono);letter-spacing:0;text-transform:none;color:var(--muted);margin-top:1px}
+nav{display:flex;gap:22px;flex:1;min-width:0;flex-wrap:wrap}
+nav button{background:none;border:0;border-bottom:3px solid transparent;padding:6px 0 9px;margin-bottom:-2px;cursor:pointer;color:var(--muted);font:600 13px var(--head);letter-spacing:.06em;text-transform:uppercase}
+nav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+nav button:hover{color:var(--ink)}
+.pill{background:none;border:0;font:400 12px var(--mono);color:var(--muted);padding:0 0 10px;cursor:default}
+.pill.btn{cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.pill.on{color:var(--good)}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+main{padding-block:24px 64px}
+h2{font:700 12px var(--head);letter-spacing:.12em;text-transform:uppercase;margin:0 0 4px}
+.sub{color:var(--muted);font-size:13px;margin:0}
+.card{background:var(--surface);border:1px solid var(--line);border-top:2px solid var(--ink);border-radius:0}
+.grid-run{display:grid;grid-template-columns:minmax(0,390px) minmax(0,1fr);gap:28px;align-items:start}
+@media(max-width:900px){.grid-run{grid-template-columns:minmax(0,1fr)}}
+.rail{display:flex;flex-direction:column;gap:20px}
+.pad{padding:14px 16px 16px}
+.samples{display:flex;flex-direction:column;margin-top:8px}
+.sgroup{font:500 11px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:14px 0 2px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.sample{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:9px 8px;cursor:pointer}
+.sample:hover{background:var(--surface-2)}
+.sample[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.sample[aria-pressed="true"] span{color:inherit;opacity:.8}
+.sample b{font:600 14px var(--head)}.sample span{display:block;color:var(--muted);font-size:12px}
+.sample b+span{display:inline!important;font:400 11px var(--mono);color:inherit!important;opacity:.75;margin-left:6px}
+textarea{width:100%;min-height:240px;resize:vertical;background:var(--surface-2);border:1px solid var(--line);border-radius:0;padding:10px;font:12px/1.55 var(--mono);color:var(--ink)}
+.glance{display:flex;flex-wrap:wrap;gap:4px 14px;margin:8px 0 10px;font:12px var(--mono);color:var(--muted)}
+.glance b{color:var(--ink);font-weight:500}
+.chip{font:12px var(--mono);padding:0;background:none;color:var(--muted);white-space:nowrap}
+.chip b{color:var(--ink);font-weight:500}
+.chip+.chip::before{content:"/";margin-right:14px;color:var(--line)}
+.primary{background:var(--ink);color:var(--bg);border:2px solid var(--ink);border-radius:0;padding:9px 18px;font:600 13px var(--head);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.primary:hover{background:var(--bg);color:var(--ink)}
+.primary[disabled]{opacity:.5;cursor:wait}
+.ghost{background:none;border:1px solid var(--ink);border-radius:0;padding:7px 12px;cursor:pointer;color:var(--ink);font:500 12px var(--head);letter-spacing:.06em;text-transform:uppercase}
+.ghost:hover{background:var(--ink);color:var(--bg)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.stack{display:flex;flex-direction:column;gap:14px}
+.stage{background:var(--surface);border:1px solid var(--line);border-top:2px solid var(--ink);border-radius:0}
+.stage[data-state="idle"]{border-top-color:var(--line)}
+.stage[data-state="idle"] .t{opacity:.55}
+.stage[data-state="running"]{background:var(--surface-2)}
+.sh{display:flex;gap:14px;align-items:center;padding:11px 14px}
+.dot{width:34px;height:28px;display:grid;place-items:center;font:500 12px var(--mono);flex:none;border:1px solid var(--line);color:var(--muted);border-radius:0}
+.dot.pass{color:var(--good);border-color:var(--good)}.dot.warn{color:var(--warn);border-color:var(--warn)}
+.dot.fail{color:var(--warn);border-color:var(--warn)}.dot.crit{color:var(--bad);border-color:var(--bad)}
+.dot.running{border-color:var(--ink);color:var(--ink);animation:blink 1s steps(2,start) infinite}
+@keyframes blink{50%{opacity:.35}}
+@media(prefers-reduced-motion:reduce){.dot.running{animation:none}}
+.sh .t{flex:1;min-width:0}.sh .t b{font:600 15px var(--head)}.sh .t div{color:var(--muted);font-size:12px}
+.ms{font:12px var(--mono);color:var(--muted)}
+.checks{border-top:1px solid var(--line);margin:0;padding:0;list-style:none}
+.checks li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding:8px 14px;border-bottom:1px solid var(--line)}
+.checks li:last-child{border-bottom:0}
+.ci{font:500 10px var(--mono);letter-spacing:.04em;padding-top:4px}
+.ci.pass{color:var(--good)}.ci.warn{color:var(--warn)}.ci.fail{color:var(--warn)}.ci.crit{color:var(--bad)}.ci.info{color:var(--muted)}
+.ck b{font-weight:600}.ck p{margin:1px 0 0;color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.tag{font:500 10px var(--mono);letter-spacing:.04em;text-transform:uppercase;padding:0 5px;border:1px solid currentColor;margin-left:8px;vertical-align:1px}
+.tag.ai{color:var(--ink)}.tag.block{color:var(--warn)}.tag.crit{color:var(--bad)}
+.badge{display:inline-block;font:600 11px var(--head);letter-spacing:.1em;padding:1px 7px;border:2px solid currentColor;text-transform:uppercase}
+.badge.approved{color:var(--good)}.badge.pending{color:var(--warn)}.badge.rejected{color:var(--bad)}
+.verdict{padding:18px 16px;border-top:1px solid var(--line);display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.verdict .big{font:700 24px var(--head);letter-spacing:.16em;text-transform:uppercase;padding:4px 16px;border:3px double currentColor;transform:rotate(-2deg);background:var(--surface)}
+.verdict.approved .big{color:var(--good)}.verdict.pending .big{color:var(--warn)}.verdict.rejected .big{color:var(--bad)}
+.verdict p{margin:0;flex:1;min-width:200px;font-weight:500}
+.risk{font:12px var(--mono);color:var(--muted)}
+.mail{margin:0 14px 14px;border:1px solid var(--line);background:var(--surface-2)}
+.mail .mh{padding:8px 12px;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.mail pre{margin:0;padding:14px;white-space:pre-wrap;font:13px/1.6 var(--font);overflow-wrap:anywhere}
+.sect{padding:12px 14px 4px;font:500 11px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.acts{margin:0 14px 14px;padding-left:18px}
+.note{margin:0 14px 12px;color:var(--muted);font-size:13px}
+details{margin-top:2px}summary{cursor:pointer;color:var(--muted);font:12px var(--mono);padding:6px 0}
+.audit{font:12px/1.6 var(--mono);color:var(--muted);margin:0;padding:10px 12px;background:var(--surface-2);overflow-x:auto}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));border-top:2px solid var(--ink);border-bottom:1px solid var(--line);margin-bottom:14px}
+.kpi{padding:12px 16px 12px 0;margin-right:16px;border-right:1px solid var(--line)}.kpi:last-child{border-right:0}
+.kpi .n{font:600 34px/1.1 var(--head);letter-spacing:-.02em;font-variant-numeric:tabular-nums}.kpi .l{color:var(--muted);font:11px var(--mono);text-transform:uppercase;letter-spacing:.04em}
+.bar{display:flex;height:8px;background:var(--line);margin:0 0 16px}
+.bar i{display:block}.bar .a{background:var(--good)}.bar .p{background:var(--warn)}.bar .r{background:var(--bad)}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th{font:500 11px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 12px;border-bottom:1px solid var(--ink);white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr.clickable{cursor:pointer}tr.clickable:hover td{background:var(--surface-2)}
+tr.clickable:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+.filters{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.filters button[data-filter]{border:1px solid var(--line);background:none;border-radius:0;padding:4px 12px;cursor:pointer;color:var(--muted);font:500 12px var(--mono)}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.filters input{border-radius:0}
+.empty{padding:36px 16px;text-align:center;color:var(--muted)}
+.map{display:grid;gap:0}
+.mstep{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding:12px 14px;border:0;border-bottom:1px solid var(--line);border-top:0}
+.mnum{font:500 13px var(--mono);color:var(--muted);padding-top:2px}
+.mstep b{font:600 15px var(--head)}
+.mstep ul{margin:6px 0 0;padding-left:18px;color:var(--muted)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:28px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;font:12px var(--mono);z-index:20}
+.lbl{display:block;font:500 11px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-top:10px}
+.fld{display:block;width:100%;padding:7px 9px;border:1px solid var(--line);background:var(--surface-2);border-radius:0;font:13px var(--mono);margin:3px 0 4px;color:var(--ink)}
+.err{color:var(--bad);font-size:13px;margin:6px 0 0}
+@media(max-width:700px){nav{order:3;flex-basis:100%;gap:18px}.top .wrap{gap:0 12px}.pill{margin-left:auto}}
+</style>
+<div class="top"><div class="wrap">
+  <div class="brand">Onboarding Desk<small>vendor verification</small></div>
+  <nav role="tablist" id="tabs">
+    <button role="tab" data-view="run" aria-selected="true">Run</button>
+    <button role="tab" data-view="dash" aria-selected="false">Dashboard <span class="chip" id="cnt">0</span></button>
+    <button role="tab" data-view="map" aria-selected="false">Process map</button>
+  </nav>
+  <button class="pill btn" id="aipill" type="button" title="Use Claude for judgement calls">AI assist</button>
+</div></div>
+<main class="wrap" id="app"></main>
+<div class="toast" id="toast" hidden></div>
+<script>
+/* ===== Vendor onboarding engine: pure rules + optional AI hooks ===== */
+const FREE_MAIL = ['gmail.com','yahoo.com','outlook.com','hotmail.com','proton.me','protonmail.com','rediffmail.com','icloud.com','aol.com'];
+const LEGAL_SUFFIX = new Set(['private','pvt','limited','ltd','llc','inc','incorporated','corp','corporation','gmbh','llp','plc','co','company','ag','ug','sa','the']);
+const DOC_TYPES = {
+  gst_certificate:{label:'GST registration certificate',countries:['IN']},
+  pan_card:{label:'PAN card',countries:['IN']},
+  cancelled_cheque:{label:'cancelled cheque',countries:['IN']},
+  incorporation_cert:{label:'certificate of incorporation',countries:['IN','GB']},
+  w9:{label:'IRS Form W-9',countries:['US']},
+  w8ben_e:{label:'IRS Form W-8BEN-E',countries:['IN','GB','DE']},
+  vat_certificate:{label:'VAT registration certificate',countries:['GB']},
+  ust_certificate:{label:'USt-IdNr confirmation letter',countries:['DE']},
+  handelsregister:{label:'Handelsregister extract',countries:['DE']},
+  bank_letter:{label:'bank confirmation letter',countries:['US','GB','DE']}
+};
+const COUNTRIES = {
+  IN:{name:'India',taxLabel:'GSTIN',requiredDocs:['gst_certificate','pan_card','cancelled_cheque','incorporation_cert'],bankProof:'cancelled_cheque'},
+  US:{name:'United States',taxLabel:'EIN',requiredDocs:['w9','bank_letter'],bankProof:'bank_letter'},
+  GB:{name:'United Kingdom',taxLabel:'VAT number',requiredDocs:['vat_certificate','bank_letter','incorporation_cert'],bankProof:'bank_letter'},
+  DE:{name:'Germany',taxLabel:'USt-IdNr',requiredDocs:['ust_certificate','bank_letter','handelsregister'],bankProof:'bank_letter'}
+};
+const TAX_RE = {
+  IN:/^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/,
+  US:/^\d{2}-\d{7}$/,
+  GB:/^GB(\d{9}|\d{12})$/,
+  DE:/^DE\d{9}$/
+};
+const IBAN_LEN = {GB:22,DE:22};
+const GST_STATE = {'01':'Jammu and Kashmir','06':'Haryana','07':'Delhi','08':'Rajasthan','09':'Uttar Pradesh','10':'Bihar','19':'West Bengal','24':'Gujarat','27':'Maharashtra','29':'Karnataka','32':'Kerala','33':'Tamil Nadu','36':'Telangana','37':'Andhra Pradesh'};
+const PAN_ENTITY = {C:'company',P:'individual',F:'firm / LLP',H:'HUF',T:'trust',A:'association',B:'body of individuals',G:'government',L:'local authority',J:'artificial juridical person'};
+
+const DEFAULT_MASTER = [
+  {id:'V-1001',legal_name:'Orion Freight Solutions Pvt Ltd',country:'IN',tax_id:'27AAACO5566B1ZL',bank_account:'50100234567890',contact_domain:'orionfreight.in',phone:'+91 22 5550 0142'},
+  {id:'V-1002',legal_name:'Lakeshore Office Supply LLC',country:'US',tax_id:'36-1234567',bank_account:'4455667788',contact_domain:'lakeshoresupply.com',phone:'+1 312 555 0190'},
+  {id:'V-1003',legal_name:'Brandt Maschinenbau GmbH',country:'DE',tax_id:'DE297345611',bank_account:'DE02120300000000202051',contact_domain:'brandt-mb.de',phone:'+49 711 5550 120'}
+];
+const WATCHLIST = ['Volga Trade Holdings','Al Noor Petroleum Traders','Meridian Shell Exports'];
+
+/* ---------- helpers ---------- */
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const todayISO = () => new Date().toISOString().slice(0,10);
+const daysBetween = (a,b) => Math.round((new Date(b)-new Date(a))/86400000);
+function get(o,p){return p.split('.').reduce((x,k)=>x==null?undefined:x[k],o)}
+function empty(v){return v==null||String(v).trim()===''}
+function normName(s){
+  s=String(s||'').toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss');
+  s=s.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/&/g,' and ').replace(/\bund\b/g,'and').replace(/[^a-z0-9 ]/g,' ');
+  return s.split(/\s+/).filter(t=>t&&!LEGAL_SUFFIX.has(t)).join(' ');
+}
+function lev(a,b){const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let p=Array.from({length:n+1},(_,j)=>j);for(let i=1;i<=m;i++){let c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[n]}
+function compareNames(a,b){
+  const na=normName(a),nb=normName(b);
+  if(!na||!nb)return{verdict:'mismatch',score:0,na,nb};
+  const score=1-lev(na,nb)/Math.max(na.length,nb.length);
+  if(na===nb||score>=0.9)return{verdict:'match',score,na,nb};
+  const ta=na.split(' '),tb=nb.split(' ');
+  const sub=(x,y)=>x.every(t=>y.includes(t));
+  if(sub(ta,tb)||sub(tb,ta)||score>=0.75)return{verdict:'ambiguous',score,na,nb};
+  return{verdict:'mismatch',score,na,nb};
+}
+function gstinValid(g){if(!/^[0-9A-Z]{15}$/.test(g))return false;const CS='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';let s=0;for(let i=0;i<14;i++){let v=CS.indexOf(g[i])*(i%2?2:1);v=Math.floor(v/36)+v%36;s+=v}return CS[(36-s%36)%36]===g[14]}
+function ibanValid(s){if(!/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(s))return false;const L=IBAN_LEN[s.slice(0,2)];if(L&&s.length!==L)return false;const r=s.slice(4)+s.slice(0,4);let n='';for(const c of r)n+=/[A-Z]/.test(c)?String(c.charCodeAt(0)-55):c;let m=0;for(const d of n)m=(m*10+ +d)%97;return m===1}
+function abaValid(r){if(!/^\d{9}$/.test(r))return false;const d=[...r].map(Number);return(3*(d[0]+d[3]+d[6])+7*(d[1]+d[4]+d[7])+(d[2]+d[5]+d[8]))%10===0}
+function maskAcct(a){a=String(a||'');return a.length>4?'••••'+a.slice(-4):a}
+function normalise(sub){
+  const s=JSON.parse(JSON.stringify(sub));
+  s.country=String(s.country||'').trim().toUpperCase();
+  s.tax_id=String(s.tax_id||'').replace(/[\s]/g,'').toUpperCase();
+  if(s.country==='US'&&/^\d{9}$/.test(s.tax_id))s.tax_id=s.tax_id.slice(0,2)+'-'+s.tax_id.slice(2);
+  if(s.pan)s.pan=String(s.pan).replace(/\s/g,'').toUpperCase();
+  s.bank=s.bank||{};
+  for(const k of ['iban','ifsc','swift'])if(s.bank[k])s.bank[k]=String(s.bank[k]).replace(/\s/g,'').toUpperCase();
+  for(const k of ['account_no','routing_no'])if(s.bank[k])s.bank[k]=String(s.bank[k]).replace(/[\s-]/g,'');
+  s.bank.bank_country=String(s.bank.bank_country||'').trim().toUpperCase();
+  s.documents=Array.isArray(s.documents)?s.documents:[];
+  return s;
+}
+const acctOf=b=>b.iban||b.account_no||'';
+const chk=(id,label,status,detail,extra={})=>({id,label,status,detail,by:'rule',...extra});
+
+/* ---------- stages ---------- */
+const STAGES=[
+  {key:'intake',title:'Intake & normalise',blurb:'Parse the submission, tidy identifiers, assign a reference'},
+  {key:'complete',title:'Completeness',blurb:'Required fields and country-specific documents'},
+  {key:'format',title:'Identifier validation',blurb:'Tax ID, bank and email formats, with checksums'},
+  {key:'cross',title:'Cross-check',blurb:'Do names, IDs, countries and documents agree?'},
+  {key:'screen',title:'Registry & risk screening',blurb:'Watchlist, duplicate vendors, bank-change controls'},
+  {key:'decide',title:'Decision',blurb:'Approved, pending or rejected, with reasons'},
+  {key:'respond',title:'Response & handoff',blurb:'Message to the vendor and internal next steps'}
+];
+
+function stageIntake(c){
+  const s=c.sub,checks=[];
+  checks.push(chk('parse','Submission parsed','pass','Valid JSON with '+Object.keys(c.raw).length+' top-level fields'));
+  const ch=[];
+  if(c.raw.tax_id!==s.tax_id)ch.push('tax ID → '+s.tax_id);
+  if(c.raw.country!==s.country)ch.push('country → '+s.country);
+  if(get(c.raw,'bank.iban')!==get(s,'bank.iban')&&get(s,'bank.iban'))ch.push('IBAN spacing removed');
+  checks.push(chk('norm','Identifiers normalised','pass',ch.length?ch.join(' · '):'Already in canonical form'));
+  checks.push(chk('ref','Reference assigned','info',c.ref+(c.resubmissionOf?' (resubmission of '+c.resubmissionOf+')':'')));
+  return{checks,summary:'Parsed and normalised'};
+}
+
+function stageComplete(c){
+  const s=c.sub,cty=COUNTRIES[s.country],checks=[];
+  if(!cty){checks.push(chk('country','Country supported','fail','"'+(s.country||'blank')+'" is not one of IN, US, GB, DE',{ask:'Please confirm the country where your business is registered.'}));return{checks,summary:'Unsupported country'}}
+  const req=[['legal_name','legal company name'],['address.line1','street address'],['address.city','city'],['address.postcode','postcode / PIN'],['contact.name','contact person'],['contact.email','contact email'],['contact.phone','contact phone'],['bank.holder_name','bank account holder name'],['bank.bank_name','bank name'],['bank.bank_country','bank country'],['tax_id',cty.taxLabel]];
+  if(['IN','US'].includes(s.country))req.push(['address.state','state']);
+  if(s.country==='IN'){req.push(['pan','PAN']);req.push(['bank.account_no','bank account number']);req.push(['bank.ifsc','IFSC code'])}
+  if(s.country==='US'){req.push(['bank.account_no','bank account number']);req.push(['bank.routing_no','ABA routing number'])}
+  if(['GB','DE'].includes(s.country))req.push(['bank.iban','IBAN']);
+  const miss=req.filter(([p])=>empty(get(s,p)));
+  checks.push(miss.length?chk('fields','Required fields','fail',miss.length+' missing: '+miss.map(m=>m[1]).join(', '),{ask:'Please provide: '+miss.map(m=>m[1]).join(', ')+'.'}):chk('fields','Required fields','pass','All '+req.length+' required fields present for '+cty.name));
+  const today=todayISO(),have=s.documents.map(d=>d.type);
+  for(const t of cty.requiredDocs){
+    const d=s.documents.find(x=>x.type===t);
+    if(!d){checks.push(chk('doc_'+t,'Document: '+DOC_TYPES[t].label,'fail','Not attached',{ask:'Please upload your '+DOC_TYPES[t].label+'.'}));continue}
+    if(d.expires&&d.expires<today){checks.push(chk('doc_'+t,'Document: '+DOC_TYPES[t].label,'fail','Expired on '+d.expires,{ask:'Your '+DOC_TYPES[t].label+' expired on '+d.expires+'. Please upload a current one.'}));continue}
+    if(t===cty.bankProof&&d.issued&&daysBetween(d.issued,today)>90){checks.push(chk('doc_'+t,'Document: '+DOC_TYPES[t].label,'fail','Issued '+d.issued+' ('+daysBetween(d.issued,today)+' days old; bank proof must be 90 days or newer)',{ask:'Your '+DOC_TYPES[t].label+' is older than 90 days. Please upload one issued in the last 90 days.'}));continue}
+    checks.push(chk('doc_'+t,'Document: '+DOC_TYPES[t].label,'pass','Attached'+(d.issued?', issued '+d.issued:'')));
+  }
+  for(const d of s.documents){
+    const info=DOC_TYPES[d.type];
+    if(!info){checks.push(chk('unk_'+d.type,'Unrecognised document','warn','"'+d.type+'" is not a known document type; ignored'));continue}
+    if(!info.countries.includes(s.country)&&!cty.requiredDocs.includes(d.type)){
+            checks.push(chk('wrong_'+d.type,'Wrong document attached','fail',info.label+' applies to vendors in '+info.countries.map(x=>COUNTRIES[x]?.name||x).join('/')+', not '+cty.name,{ask:'The '+info.label+' you attached does not apply to a business registered in '+cty.name+', so we have set it aside. The documents we need are listed above.'}));
+    }
+  }
+  const bad=checks.filter(x=>x.status==='fail').length;
+  return{checks,summary:bad?bad+' gap'+(bad>1?'s':'')+' found':'Complete'};
+}
+
+function stageFormat(c){
+  const s=c.sub,cty=COUNTRIES[s.country],checks=[];
+  if(!cty)return{checks:[chk('skip','Skipped','info','No supported country')],summary:'Skipped'};
+  const t=s.tax_id;
+  if(!empty(t)){
+    let ok=TAX_RE[s.country].test(t),extra='',other=Object.keys(TAX_RE).find(k=>k!==s.country&&TAX_RE[k].test(t));
+    if(ok&&s.country==='IN'){ok=gstinValid(t);if(!ok)extra=' (pattern fits but checksum digit is wrong; likely a typo)'}
+    if(ok)checks.push(chk('tax','Tax ID ('+cty.taxLabel+')','pass',t+' passes '+(s.country==='IN'?'pattern and checksum':'format check')));
+    else checks.push(chk('tax','Tax ID ('+cty.taxLabel+')','fail',t+' is not a valid '+cty.taxLabel+extra+(other?'. It looks like a '+COUNTRIES[other].taxLabel+' ('+COUNTRIES[other].name+')':''),{ask:'The '+cty.taxLabel+' "'+t+'" does not look valid for '+cty.name+'. Please re-check and send the correct number.'}));
+  }
+  if(s.country==='IN'&&s.pan){const ok=/^[A-Z]{5}\d{4}[A-Z]$/.test(s.pan);checks.push(ok?chk('pan','PAN','pass',s.pan+' format valid'):chk('pan','PAN','fail',s.pan+' is not a valid PAN',{ask:'The PAN "'+s.pan+'" is not in a valid format. Please re-check.'}))}
+  const b=s.bank;
+  if(['GB','DE'].includes(s.country)&&b.iban){
+    const ok=ibanValid(b.iban);
+    checks.push(ok?chk('iban','IBAN','pass',b.iban.slice(0,4)+'…'+b.iban.slice(-4)+' passes mod-97 checksum'):chk('iban','IBAN','fail','IBAN fails length or mod-97 checksum',{ask:'The IBAN you provided is not valid. Please re-check it against your bank statement.'}));
+  }
+  if(s.country==='IN'&&b.ifsc){const ok=/^[A-Z]{4}0[A-Z0-9]{6}$/.test(b.ifsc);checks.push(ok?chk('ifsc','IFSC','pass',b.ifsc+' format valid'):chk('ifsc','IFSC','fail',b.ifsc+' is not a valid IFSC',{ask:'The IFSC "'+b.ifsc+'" is not valid. Please re-check.'}))}
+  if(s.country==='IN'&&b.account_no){const ok=/^\d{9,18}$/.test(b.account_no);checks.push(ok?chk('acct','Account number','pass','Length and digits valid'):chk('acct','Account number','fail','Indian account numbers are 9 to 18 digits',{ask:'Your bank account number looks incorrect. Please re-check.'}))}
+  if(s.country==='US'){
+    if(b.routing_no){const ok=abaValid(b.routing_no);checks.push(ok?chk('aba','ABA routing number','pass','Passes ABA checksum'):chk('aba','ABA routing number','fail','Fails ABA checksum',{ask:'The ABA routing number is not valid. Please re-check.'}))}
+    if(b.account_no){const ok=/^\d{4,17}$/.test(b.account_no);checks.push(ok?chk('acct','Account number','pass','Length and digits valid'):chk('acct','Account number','fail','US account numbers are 4 to 17 digits',{ask:'Your bank account number looks incorrect. Please re-check.'}))}
+  }
+  const em=get(s,'contact.email');
+  if(em){const ok=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em);checks.push(ok?chk('email','Contact email','pass','Syntax valid'):chk('email','Contact email','fail',em+' is not a valid email',{ask:'The contact email address looks invalid. Please send a working one.'}))}
+  if(!checks.length)checks.push(chk('none','Nothing to validate','info','No identifiers supplied'));
+  const bad=checks.filter(x=>x.status==='fail').length;
+  return{checks,summary:bad?bad+' invalid identifier'+(bad>1?'s':''):'All identifiers valid'};
+}
+
+async function stageCross(c){
+  const s=c.sub,cty=COUNTRIES[s.country],checks=[];
+  if(!cty)return{checks:[chk('skip','Skipped','info','No supported country')],summary:'Skipped'};
+  const b=s.bank,legal=s.legal_name;
+  // 1. bank holder vs legal name
+  if(!empty(b.holder_name)&&!empty(legal)){
+    const cmp=compareNames(legal,b.holder_name);
+    const trade=!empty(s.trading_name)&&compareNames(s.trading_name,b.holder_name).verdict==='match';
+    const askConfirm='The bank account is held in the name "'+b.holder_name+'", but your registered name is "'+legal+'". Please send a bank letter in the registered name, or explain the relationship.';
+    if(cmp.verdict==='match'){
+      const same=normName(legal)===normName(b.holder_name)&&legal.trim()!==b.holder_name.trim();
+      checks.push(chk('holder','Bank holder vs legal name','pass',same?'"'+b.holder_name+'" = "'+legal+'" after normalising punctuation, accents and legal suffixes':'Names match',same?{note:'Name spelling variant reconciled'}:{}));
+    }else if(cmp.verdict==='ambiguous'||trade){
+      let r=null;
+      if(c.ai){try{r=await c.ai.judge({legal,trading:s.trading_name,holder:b.holder_name,country:cty.name})}catch(e){c.aiError=e.message||'AI unavailable'}}
+      if(r&&typeof r.same_entity==='boolean'){
+        if(r.same_entity&&Number(r.confidence)>=0.75)checks.push(chk('holder','Bank holder vs legal name','warn','AI judged "'+b.holder_name+'" the same entity as "'+legal+'" ('+Math.round(r.confidence*100)+'% confident): '+r.reason,{by:'ai',note:'Account holder differs from legal name; accepted as '+(trade?'declared trading name':'same entity')+' (AI-assisted)'}));
+        else checks.push(chk('holder','Bank holder vs legal name','fail','AI could not confirm "'+b.holder_name+'" is the same entity as "'+legal+'": '+r.reason,{by:'ai',ask:askConfirm}));
+      }else{
+        checks.push(chk('holder','Bank holder vs legal name','fail','Names are similar but not equal ("'+b.holder_name+'" vs "'+legal+'") and no AI judgement was available, so a human must confirm',{ask:askConfirm}));
+      }
+    }else checks.push(chk('holder','Bank holder vs legal name','fail','"'+b.holder_name+'" does not match "'+legal+'" (similarity '+Math.round(cmp.score*100)+'%)',{ask:askConfirm}));
+  }
+  // 2. documents vs submission
+  const idTarget={gst_certificate:()=>s.tax_id,pan_card:()=>s.pan,w9:()=>s.tax_id,vat_certificate:()=>s.tax_id,ust_certificate:()=>s.tax_id,cancelled_cheque:()=>acctOf(b),bank_letter:()=>acctOf(b)};
+  for(const d of s.documents){
+    const info=DOC_TYPES[d.type];if(!info)continue;
+    const isBank=['cancelled_cheque','bank_letter'].includes(d.type);
+    if(d.name_on_doc){
+      const target=isBank?b.holder_name:legal;
+      const cmp=compareNames(target,d.name_on_doc);
+      if(cmp.verdict==='match')checks.push(chk('docname_'+d.type,'Name on '+info.label,'pass','"'+d.name_on_doc+'" consistent'));
+      else if(cmp.verdict==='ambiguous')checks.push(chk('docname_'+d.type,'Name on '+info.label,'warn','"'+d.name_on_doc+'" is similar to but not the same as "'+target+'"'));
+      else checks.push(chk('docname_'+d.type,'Name on '+info.label,'fail','"'+d.name_on_doc+'" does not match "'+target+'"',{ask:'The name on your '+info.label+' ("'+d.name_on_doc+'") does not match the name you submitted ("'+target+'"). Please send a matching document or correct the form.'}));
+    }
+    const tg=idTarget[d.type]&&idTarget[d.type]();
+    if(d.id_on_doc&&tg){
+      const a=String(d.id_on_doc).replace(/[\s-]/g,'').toUpperCase(),bb=String(tg).replace(/[\s-]/g,'').toUpperCase();
+      checks.push(a===bb?chk('docid_'+d.type,'ID on '+info.label,'pass','Matches submission'):chk('docid_'+d.type,'ID on '+info.label,'fail','Document shows '+(isBank?maskAcct(a):a)+', form says '+(isBank?maskAcct(bb):bb),{ask:'The number on your '+info.label+' does not match the form. Please check which one is correct and resend.'}));
+    }
+  }
+  // 3. country consistency
+  const bc=b.bank_country;
+  if(bc){
+    if(bc===s.country)checks.push(chk('bcountry','Bank country vs vendor country','pass',COUNTRIES[bc]?.name||bc));
+    else checks.push(chk('bcountry','Bank country vs vendor country','warn','Vendor is in '+cty.name+' but account is in '+(COUNTRIES[bc]?.name||bc)+'. Payments would be cross-border.',{note:'Bank account is in a different country from the vendor',weight:15}));
+  }
+  if(b.iban&&bc&&b.iban.slice(0,2)!==bc)checks.push(chk('ibanc','IBAN country','fail','IBAN prefix '+b.iban.slice(0,2)+' disagrees with bank country '+bc,{ask:'Your IBAN country does not match the bank country on the form. Please confirm which is correct.'}));
+  // 4. India: GSTIN ↔ PAN ↔ state ↔ entity type
+  if(s.country==='IN'&&gstinValid(s.tax_id)){
+    const emb=s.tax_id.slice(2,12);
+    if(s.pan){
+      checks.push(emb===s.pan?chk('gstpan','GSTIN contains submitted PAN','pass','PAN '+emb+' embedded in GSTIN matches'):chk('gstpan','GSTIN contains submitted PAN','fail','GSTIN embeds PAN '+emb+' but the form says '+s.pan+'. Same-looking IDs that belong to different taxpayers are a classic sign of borrowed credentials.',{ask:'The PAN inside your GSTIN ('+emb+') differs from the PAN you submitted ('+s.pan+'). Please confirm which entity is onboarding and send the matching GST certificate and PAN card.'}));
+    }
+    const st=GST_STATE[s.tax_id.slice(0,2)],addrSt=get(s,'address.state');
+    if(st&&addrSt){
+      const m=normName(addrSt)===normName(st);
+      checks.push(m?chk('gststate','GSTIN state vs address','pass',st+' matches'):chk('gststate','GSTIN state vs address','fail','GSTIN state code '+s.tax_id.slice(0,2)+' is '+st+', but address is in '+addrSt,{ask:'Your GSTIN is registered in '+st+' but your address is in '+addrSt+'. Please send the GST registration for the address you want to invoice from, or confirm the correct address.'}));
+    }
+    const p4=emb[3],isCo=/\b(pvt|private|ltd|limited)\b/i.test(legal||'');
+    if(isCo&&p4!=='C')checks.push(chk('panent','PAN entity type vs company name','fail','PAN type "'+p4+'" ('+(PAN_ENTITY[p4]||'unknown')+') but the name is a company',{ask:'The PAN type does not match a registered company. Please confirm the legal entity type.'}));
+    else if(isCo)checks.push(chk('panent','PAN entity type vs company name','pass','PAN type C (company) fits a "Pvt Ltd / Limited"'));
+  }
+  // 5. contact email
+  const em=get(s,'contact.email');
+  if(em&&/@/.test(em)){
+    const dom=em.split('@')[1].toLowerCase();
+    if(FREE_MAIL.includes(dom))checks.push(chk('mail','Contact email domain','warn',dom+' is a free mailbox for a company vendor',{note:'Contact uses a free email domain',weight:12}));
+    else checks.push(chk('mail','Contact email domain','pass',dom+' is a business domain'));
+  }
+  const bad=checks.filter(x=>x.status==='fail').length,w=checks.filter(x=>x.status==='warn').length;
+  return{checks,summary:bad?bad+' inconsistenc'+(bad>1?'ies':'y'):(w?'Consistent, '+w+' note'+(w>1?'s':''):'Fully consistent')};
+}
+
+function stageScreen(c){
+  const s=c.sub,b=s.bank,checks=[],M=c.master;
+  const names=[s.legal_name,s.trading_name,b.holder_name].filter(Boolean);
+  const hit=WATCHLIST.find(w=>names.some(n=>{const v=compareNames(w,n).verdict;return v==='match'}));
+  checks.push(hit?chk('watch','Watchlist screening','crit','Name matches watchlist entry "'+hit+'"',{internal:'Watchlist hit: '+hit}):chk('watch','Watchlist screening','pass','No match against '+WATCHLIST.length+' demo watchlist entries (legal, trading and bank holder names)'));
+  const acct=acctOf(b);
+  const byTax=M.find(v=>v.tax_id===s.tax_id&&!empty(s.tax_id));
+  const byAcct=M.find(v=>acct&&v.bank_account===acct);
+  if(byTax){
+    const nm=compareNames(byTax.legal_name,s.legal_name).verdict;
+    if(nm==='mismatch')checks.push(chk('dup_tax','Tax ID already registered','crit','Tax ID is already on vendor '+byTax.id+' under a different name ("'+byTax.legal_name+'")',{internal:'Tax ID belongs to '+byTax.id+' ('+byTax.legal_name+')'}));
+    else if(byTax.bank_account===acct)checks.push(chk('dup_tax','Existing vendor','crit','Already onboarded as '+byTax.id,{internal:'Duplicate of '+byTax.id}));
+    else{
+      checks.push(chk('bankchg','Bank change on existing vendor','fail','Vendor '+byTax.id+' already exists; this submission changes the bank account ('+maskAcct(byTax.bank_account)+' → '+maskAcct(acct)+'). Policy: bank changes need call-back verification before any payment.',{ask:'Because this changes the bank details we hold for you, we will phone you on the number already on file to confirm. We do not act on bank changes received by email alone. No other action is needed from you.',internal:'Call '+byTax.id+' on the master-data number '+byTax.phone+' (not any number in the email) before accepting the new account.',weight:25}));
+      const dom=(get(s,'contact.email')||'').split('@')[1]||'';
+      if(dom&&dom.toLowerCase()!==byTax.contact_domain)checks.push(chk('lookalike','Email domain vs vendor on file','warn','Request came from '+dom+' but '+byTax.id+' uses '+byTax.contact_domain+' (possible look-alike domain)',{note:'Sender domain differs from the vendor on file',weight:20}));
+    }
+  }else checks.push(chk('dup_tax','Tax ID uniqueness','pass','Not in vendor master ('+M.length+' vendors)'));
+  if(byAcct&&(!byTax||byTax.id!==byAcct.id))checks.push(chk('dup_acct','Bank account belongs to another vendor','crit','Account '+maskAcct(acct)+' is already registered to '+byAcct.id+' ('+byAcct.legal_name+'), a different vendor',{internal:'Bank account belongs to '+byAcct.id+'. Alert the owner of that vendor record via the contact on file.'}));
+  else if(!byAcct)checks.push(chk('dup_acct','Bank account uniqueness','pass','Account not used by any other vendor'));
+  return{checks,summary:checks.some(x=>x.status==='crit')?'Critical flag':checks.some(x=>x.status==='fail')?'Control triggered':'Clear'};
+}
+
+function riskScore(all){let r=0;for(const k of all){if(k.status==='warn')r+=k.weight||8;else if(k.status==='fail')r+=k.weight||18;else if(k.status==='crit')r+=60}return Math.min(100,r)}
+
+function stageDecide(c){
+  const all=c.allChecks,crit=all.filter(x=>x.status==='crit'),fail=all.filter(x=>x.status==='fail'),warn=all.filter(x=>x.status==='warn');
+  const risk=riskScore(all);c.risk=risk;
+  let status,headline;
+  if(crit.length){status='rejected';headline='Rejected: '+crit[0].label.toLowerCase()+'. Escalated to Risk, not retryable by the vendor.'}
+  else if(fail.length){status='pending';headline='Pending: '+fail.length+' item'+(fail.length>1?'s':'')+' to resolve before approval.'}
+  else{status='approved';headline='Approved'+(warn.length?' with '+warn.length+' note'+(warn.length>1?'s':''):'')+'.'}
+  c.status=status;
+  const reasons=[...crit,...fail,...warn].map(x=>({status:x.status,label:x.label,detail:x.detail}));
+  return{checks:[],decision:{status,headline,reasons,risk},summary:status[0].toUpperCase()+status.slice(1)+' · risk '+risk};
+}
+
+function templateMessage(c){
+  const s=c.sub,name=get(s,'contact.name')||'there',asks=[...new Set(c.allChecks.filter(x=>x.ask).map(x=>x.ask))],ref=c.ref;
+  if(c.status==='approved'){
+    const notes=c.allChecks.filter(x=>x.note).map(x=>x.note);
+    return{subject:'Welcome aboard: '+s.legal_name+' is approved ('+ref+')',body:'Hi '+name+',\n\nThanks for completing onboarding. '+s.legal_name+' is now approved as a vendor.\n\nNext steps:\n• Quote your purchase order number on every invoice.\n• Send invoices to the accounts payable inbox you will receive from your buyer.\n'+(notes.length?'\nFor your records, we noted: '+notes.join('; ').toLowerCase()+'.\n':'')+'\nRegards,\nProcurement Operations',by:'template'};
+  }
+  if(c.status==='rejected')return{subject:'Update on your vendor application ('+ref+')',body:'Hi '+name+',\n\nThank you for applying to become a vendor. After our standard verification checks, we are unable to complete your onboarding at this time. We are not able to share further detail on the outcome.\n\nIf you believe this is a mistake, please contact vendor-support@example.com and quote reference '+ref+'.\n\nRegards,\nProcurement Operations',by:'template (fixed wording)'};
+  return{subject:'Action needed to complete your vendor onboarding ('+ref+')',body:'Hi '+name+',\n\nThank you for submitting your details. To finish verification we need the following:\n\n'+asks.map(a=>'• '+a).join('\n')+'\n\nOnce we have everything in one reply, we will review it within 2 business days. Your application stays on hold until then.\n\nRegards,\nProcurement Operations',by:'template'};
+}
+
+async function stageRespond(c){
+  const s=c.sub,checks=[];
+  let msg=templateMessage(c),aiUsed=false;
+  if(c.status==='pending'&&c.ai){
+    try{
+      const asks=[...new Set(c.allChecks.filter(x=>x.ask).map(x=>x.ask))];
+      const body=await c.ai.draft({contact:get(s,'contact.name')||'there',vendor:s.legal_name,ref:c.ref,asks});
+      if(body&&body.length>40){msg={subject:msg.subject,body,by:'AI draft from structured asks'};aiUsed=true}
+    }catch(e){c.aiError=c.aiError||e.message}
+  }
+  const actions=[];
+  for(const k of c.allChecks)if(k.internal)actions.push(k.internal);
+  if(c.status==='approved')actions.push('Create vendor record in ERP (simulated) and enable payments');
+  if(c.status==='pending')actions.push('Set a 5-business-day follow-up reminder; auto-close the application if no response in 15 days');
+  if(c.status==='rejected')actions.push('Route to Risk & Compliance with full audit trail; do not discuss reasons with the vendor');
+  const note=c.status==='rejected'?'Reasons are kept internal. The vendor sees fixed, neutral wording so we do not teach a fraudster which control caught them.':c.status==='pending'?'The vendor gets one consolidated list of every gap, not a trickle of follow-ups.':'No outstanding items.';
+  checks.push(chk('msg','Vendor message prepared','pass',(c.status==='approved'?'Welcome note':c.status==='pending'?'Request for '+new Set(c.allChecks.filter(x=>x.ask).map(x=>x.ask)).size+' item(s)':'Neutral decline')+' · '+msg.by,{by:aiUsed?'ai':'rule'}));
+  checks.push(chk('handoff','Internal handoff','pass',actions.length+' action'+(actions.length===1?'':'s')+' queued'));
+  return{checks,message:msg,internal:{actions,note},summary:c.status==='approved'?'Welcome note drafted':c.status==='pending'?'Request drafted':'Neutral decline drafted',aiUsed};
+}
+
+/* ---------- runner ---------- */
+let REF_COUNTER=1000;
+function seedRefCounter(refs){for(const r of refs){const m=/^OB-(\d+)/.exec(r||'');if(m)REF_COUNTER=Math.max(REF_COUNTER,+m[1])}}
+async function runPipeline(rawText,opts={}){
+  const t0=Date.now(),delay=opts.delay??0,audit=[],log=e=>audit.push({t:new Date().toISOString(),event:e});
+  let raw;
+  try{raw=typeof rawText==='string'?JSON.parse(rawText):rawText}catch(e){throw new Error('Input is not valid JSON: '+e.message)}
+  const ref=opts.ref||('OB-'+(++REF_COUNTER));
+  const c={raw,sub:normalise(raw),ref,resubmissionOf:opts.resubmissionOf,ai:opts.ai||null,master:opts.master||DEFAULT_MASTER,allChecks:[],aiError:null};
+  const fns=[stageIntake,stageComplete,stageFormat,stageCross,stageScreen,stageDecide,stageRespond];
+  const stages=[];
+  log('Submission received for "'+(raw.legal_name||'unnamed')+'"');
+  for(let i=0;i<fns.length;i++){
+    opts.onStageStart&&opts.onStageStart(i);
+    const ts=Date.now();
+    if(delay)await sleep(delay);
+    const r=await fns[i](c);
+    r.ms=Date.now()-ts;
+    if(i>0&&i<5)c.allChecks.push(...r.checks);
+    stages.push(r);
+    log(STAGES[i].title+': '+r.summary);
+    opts.onStageDone&&opts.onStageDone(i,r);
+  }
+  const dec=stages[5].decision,resp=stages[6];
+  log('Decision: '+dec.status);
+  return{id:ref,ref,resubmissionOf:opts.resubmissionOf||null,at:new Date().toISOString(),vendor:c.sub.legal_name||'(unnamed)',country:c.sub.country,status:dec.status,risk:dec.risk,
+    issues:dec.reasons.length,stages,decision:dec,message:resp.message,internal:resp.internal,audit,durationMs:Date.now()-t0,input:raw,aiUsed:resp.aiUsed||c.allChecks.some(x=>x.by==='ai'),aiError:c.aiError};
+}
+/* ===== Sample submissions (dates are relative to today) ===== */
+const dAgo=n=>{const d=new Date();d.setDate(d.getDate()-n);return d.toISOString().slice(0,10)};
+const dAhead=n=>dAgo(-n);
+
+const S_KESTREL=()=>({
+  legal_name:'Kestrel Logistics Private Limited',country:'IN',tax_id:'29AABCK4521M1ZC',pan:'AABCK4521M',category:'Freight & logistics',
+  address:{line1:'14, Residency Road',city:'Bengaluru',state:'Karnataka',postcode:'560025'},
+  contact:{name:'Meera Iyer',email:'meera.iyer@kestrellogistics.in',phone:'+91 80 5550 1177'},
+  bank:{holder_name:'Kestrel Logistics Pvt Ltd',bank_name:'HDFC Bank',account_no:'50200087654321',ifsc:'HDFC0001234',bank_country:'IN',currency:'INR'},
+  documents:[
+    {type:'gst_certificate',name_on_doc:'Kestrel Logistics Private Limited',id_on_doc:'29AABCK4521M1ZC',issued:dAgo(900)},
+    {type:'pan_card',name_on_doc:'Kestrel Logistics Private Limited',id_on_doc:'AABCK4521M',issued:dAgo(2200)},
+    {type:'cancelled_cheque',name_on_doc:'Kestrel Logistics Pvt Ltd',id_on_doc:'50200087654321',issued:dAgo(20)},
+    {type:'incorporation_cert',name_on_doc:'Kestrel Logistics Private Limited',issued:dAgo(2200)}]
+});
+const S_PINECREST=()=>({
+  legal_name:'Pinecrest Industrial Supply LLC',country:'US',tax_id:'843920175',category:'MRO supplies',
+  address:{line1:'2100 Congress Ave, Suite 400',city:'Austin',state:'TX',postcode:'78701'},
+  contact:{name:'Dana Whitfield',email:'ap@pinecrestsupply.com',phone:'+1 512 555 0148'},
+  bank:{holder_name:'Pinecrest Industrial Supply LLC',bank_name:'JPMorgan Chase',account_no:'483920174',routing_no:'021000021',bank_country:'US',currency:'USD'},
+  documents:[
+    {type:'w9',name_on_doc:'Pinecrest Industrial Supply LLC',id_on_doc:'84-3920175',issued:dAgo(30)},
+    {type:'bank_letter',name_on_doc:'Pinecrest Industrial Supply LLC',id_on_doc:'483920174',issued:dAgo(12)}]
+});
+const S_MUELLER=()=>({
+  legal_name:'Müller & Söhne GmbH',country:'DE',tax_id:'DE 811 128 135',category:'Machining services',
+  address:{line1:'Königstraße 22',city:'Stuttgart',postcode:'70173'},
+  contact:{name:'Katrin Müller',email:'buchhaltung@mueller-soehne.de',phone:'+49 711 5550 240'},
+  bank:{holder_name:'Mueller und Soehne GmbH',bank_name:'Commerzbank',iban:'DE89 3704 0044 0532 0130 00',bank_country:'DE',currency:'EUR'},
+  documents:[
+    {type:'ust_certificate',name_on_doc:'Müller & Söhne GmbH',id_on_doc:'DE811128135',issued:dAgo(400)},
+    {type:'bank_letter',name_on_doc:'Mueller und Soehne GmbH',id_on_doc:'DE89370400440532013000',issued:dAgo(25)},
+    {type:'handelsregister',name_on_doc:'Müller & Söhne GmbH',issued:dAgo(60)}]
+});
+const S_BRIGHTWELL=()=>({
+  legal_name:'Brightwell Analytics Ltd',trading_name:'Brightwell Data Analytics Services',country:'GB',tax_id:'GB284517936',category:'Consulting',
+  address:{line1:'9 Clerkenwell Green',city:'London',postcode:'EC1R 0DP'},
+  contact:{name:'Oliver Grant',email:'finance@brightwell-analytics.co.uk',phone:'+44 20 5550 0183'},
+  bank:{holder_name:'Brightwell Data Analytics Services',bank_name:'NatWest',iban:'GB29NWBK60161331926819',bank_country:'GB',currency:'GBP'},
+  documents:[
+    {type:'vat_certificate',name_on_doc:'Brightwell Analytics Ltd',id_on_doc:'GB284517936',issued:dAgo(500)},
+    {type:'bank_letter',name_on_doc:'Brightwell Data Analytics Services',id_on_doc:'GB29NWBK60161331926819',issued:dAgo(15)},
+    {type:'incorporation_cert',name_on_doc:'Brightwell Analytics Ltd',issued:dAgo(1500)}]
+});
+const S_SUNDARAM=()=>({
+  legal_name:'Sundaram Precision Components Private Limited',country:'IN',tax_id:'33AAGCS1122P1ZD',pan:'AAFCS7788K',category:'Manufacturing',
+  address:{line1:'Plot 41, Chakan MIDC',city:'Pune',state:'Maharashtra',postcode:'410501'},
+  contact:{name:'Arvind Sundaram',email:'accounts@sundaramprecision.in',phone:'+91 20 5550 3321'},
+  bank:{holder_name:'Sundaram Precision Components Pvt Ltd',bank_name:'ICICI Bank',account_no:'004105009988',ifsc:'ICIC0000041',bank_country:'IN',currency:'INR'},
+  documents:[
+    {type:'gst_certificate',name_on_doc:'Sundaram Precision Components Private Limited',id_on_doc:'33AAGCS1122P1ZD',issued:dAgo(700)},
+    {type:'pan_card',name_on_doc:'Sundaram Precision Components Private Limited',id_on_doc:'AAFCS7788K',issued:dAgo(2000)},
+    {type:'cancelled_cheque',name_on_doc:'Sundaram Precision Components Pvt Ltd',id_on_doc:'004105009988',issued:dAgo(10)},
+    {type:'incorporation_cert',name_on_doc:'Sundaram Precision Components Private Limited',issued:dAgo(2000)}]
+});
+const S_AARAV_BAD=()=>({
+  legal_name:'Aarav Textiles Pvt Ltd',country:'IN',tax_id:'24AABCA9087F1ZO',pan:'AABCA9087F',category:'Textiles',
+  address:{line1:'Unit 7, Sachin GIDC',city:'Surat',state:'Gujarat',postcode:''},
+  contact:{name:'Nisha Patel',email:'nisha@aaravtextiles.in',phone:''},
+  bank:{holder_name:'Aarav Textiles Pvt Ltd',bank_name:'State Bank of India',account_no:'32145678901',ifsc:'SBIN0001122',bank_country:'IN',currency:'INR'},
+  documents:[
+    {type:'w9',name_on_doc:'Aarav Textiles Pvt Ltd',id_on_doc:'24AABCA9087F1ZO',issued:dAgo(40)},
+    {type:'gst_certificate',name_on_doc:'Aarav Textiles Pvt Ltd',id_on_doc:'24AABCA9087F1ZO',issued:dAgo(600)},
+    {type:'cancelled_cheque',name_on_doc:'Aarav Textiles Pvt Ltd',id_on_doc:'32145678901',issued:dAgo(140)}]
+});
+const S_AARAV_FIX=()=>{const s=S_AARAV_BAD();
+  s.address.postcode='395007';s.contact.phone='+91 261 5550 2290';
+  s.documents=[
+    {type:'gst_certificate',name_on_doc:'Aarav Textiles Pvt Ltd',id_on_doc:'24AABCA9087F1ZO',issued:dAgo(600)},
+    {type:'pan_card',name_on_doc:'Aarav Textiles Pvt Ltd',id_on_doc:'AABCA9087F',issued:dAgo(1800)},
+    {type:'cancelled_cheque',name_on_doc:'Aarav Textiles Pvt Ltd',id_on_doc:'32145678901',issued:dAgo(6)},
+    {type:'incorporation_cert',name_on_doc:'Aarav Textiles Pvt Ltd',issued:dAgo(1800)}];
+  return s};
+const S_ZENITH=()=>({
+  legal_name:'Zenith Cargo Movers Private Limited',country:'IN',tax_id:'27AABCZ3310D1ZR',pan:'AABCZ3310D',category:'Freight & logistics',
+  address:{line1:'Shed 3, Bhiwandi Logistics Park',city:'Thane',state:'Maharashtra',postcode:'421302'},
+  contact:{name:'R. Verma',email:'zenith.cargomovers@gmail.com',phone:'+91 98 5550 7710'},
+  bank:{holder_name:'Orion Freight Solutions Pvt Ltd',bank_name:'HDFC Bank',account_no:'50100234567890',ifsc:'HDFC0001234',bank_country:'IN',currency:'INR'},
+  documents:[
+    {type:'gst_certificate',name_on_doc:'Zenith Cargo Movers Private Limited',id_on_doc:'27AABCZ3310D1ZR',issued:dAgo(300)},
+    {type:'pan_card',name_on_doc:'Zenith Cargo Movers Private Limited',id_on_doc:'AABCZ3310D',issued:dAgo(1000)},
+    {type:'cancelled_cheque',name_on_doc:'Orion Freight Solutions Pvt Ltd',id_on_doc:'50100234567890',issued:dAgo(9)},
+    {type:'incorporation_cert',name_on_doc:'Zenith Cargo Movers Private Limited',issued:dAgo(1000)}]
+});
+const S_LAKESHORE_CHG=()=>({
+  legal_name:'Lakeshore Office Supply LLC',country:'US',tax_id:'36-1234567',existing_vendor_id:'V-1002',category:'Office supplies',
+  address:{line1:'500 W Madison St',city:'Chicago',state:'IL',postcode:'60661'},
+  contact:{name:'Paul Reyes',email:'paul.reyes@lakeshore-supply.co',phone:'+1 312 555 0177'},
+  bank:{holder_name:'Lakeshore Office Supply LLC',bank_name:'Wells Fargo',account_no:'7712003345',routing_no:'121000248',bank_country:'US',currency:'USD'},
+  documents:[
+    {type:'w9',name_on_doc:'Lakeshore Office Supply LLC',id_on_doc:'36-1234567',issued:dAgo(5)},
+    {type:'bank_letter',name_on_doc:'Lakeshore Office Supply LLC',id_on_doc:'7712003345',issued:dAgo(3)}]
+});
+
+const SAMPLES=[
+  {id:'kestrel',group:'Happy path',title:'Kestrel Logistics',tag:'India · clean',blurb:'All fields and documents agree. Bank holder says "Pvt Ltd", registration says "Private Limited".',build:S_KESTREL},
+  {id:'pinecrest',group:'Happy path',title:'Pinecrest Industrial Supply',tag:'US · clean',blurb:'EIN entered without a hyphen, W-9 and bank letter attached.',build:S_PINECREST},
+  {id:'mueller',group:'Edge case 1',title:'Müller & Söhne',tag:'Same entity, spelled differently',blurb:'Umlauts, "&" vs "und" and spacing in the IBAN. A naive match rejects a legitimate vendor.',build:S_MUELLER},
+  {id:'brightwell',group:'Edge case 1b',title:'Brightwell Analytics',tag:'Trading name on the bank account',blurb:'Bank account is in a longer trading name. Rules cannot decide; this is where AI judgement is used.',build:S_BRIGHTWELL},
+  {id:'sundaram',group:'Edge case 2',title:'Sundaram Precision',tag:'Valid IDs that disagree',blurb:'GSTIN passes its checksum, but the PAN inside it differs from the PAN submitted, and its state is not the address state.',build:S_SUNDARAM},
+  {id:'aarav',group:'Edge case 3',title:'Aarav Textiles',tag:'Wrong, missing and stale documents',blurb:'US W-9 for an Indian vendor, no PAN card or incorporation certificate, 140-day-old cheque, missing phone and PIN. One consolidated request, then resubmit.',build:S_AARAV_BAD,fix:S_AARAV_FIX},
+  {id:'zenith',group:'Edge case 4',title:'Zenith Cargo Movers',tag:'Looks fine, is a fraud pattern',blurb:'Every format is valid, but the bank account belongs to an existing vendor under another name. Free-mail contact.',build:S_ZENITH},
+  {id:'lakeshore',group:'Edge case 5',title:'Lakeshore Office Supply',tag:'Bank change on existing vendor',blurb:'Known vendor, new bank account, look-alike email domain. Call-back verification instead of a decision by email.',build:S_LAKESHORE_CHG}
+];
+/* ===== UI ===== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const KEY='onboarding-desk.history.v1';
+const S={view:'run',history:[],text:'',loaded:null,live:null,running:false,filter:'all',q:'',aiNs:null,aiOn:false,aiNote:'',err:'',resubOf:null};
+
+function loadHist(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}}
+function saveHist(){try{localStorage.setItem(KEY,JSON.stringify(S.history.slice(0,200)))}catch(e){}}
+function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,2400)}
+const fmtT=iso=>new Date(iso).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+const fmtMs=ms=>ms>=1000?(ms/1000).toFixed(1)+' s':ms+' ms';
+
+/* ---------- AI adapter: Claude on this page, or your own key for Gemini / OpenAI / Anthropic ---------- */
+function withTimeout(p,ms){return Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error('AI timed out')),ms))])}
+const PROV={
+  page:{label:'Claude (this page)'},
+  gemini:{label:'Google Gemini',model:'gemini-2.5-flash',hint:'Free key at aistudio.google.com/apikey'},
+  openai:{label:'OpenAI',model:'gpt-4o-mini',hint:'Key at platform.openai.com/api-keys'},
+  anthropic:{label:'Anthropic Claude',model:'claude-haiku-5-5',hint:'Key at console.anthropic.com'}
+};
+S.prov={type:'none',key:'',model:''};
+function aiReady(){const t=S.prov.type;return t==='page'?!!S.aiNs:(t!=='none'&&!!PROV[t]&&!!S.prov.key)}
+function saveProv(){try{sessionStorage.setItem('od.prov',JSON.stringify(S.prov))}catch(e){}}
+function loadProv(){try{const v=JSON.parse(sessionStorage.getItem('od.prov')||'null');if(v&&v.type)S.prov=v}catch(e){}}
+async function askLLM(prompt){
+  const p=S.prov;
+  if(p.type==='page'){const r=await S.aiNs(prompt,{cache:false});return String(r&&r.text||'').trim()}
+  const model=p.model||PROV[p.type].model;let url,opt;
+  if(p.type==='gemini'){url='https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(model)+':generateContent?key='+encodeURIComponent(p.key);opt={method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})}}
+  else if(p.type==='openai'){url='https://api.openai.com/v1/chat/completions';opt={method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+p.key},body:JSON.stringify({model,messages:[{role:'user',content:prompt}]})}}
+  else{url='https://api.anthropic.com/v1/messages';opt={method:'POST',headers:{'Content-Type':'application/json','x-api-key':p.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model,max_tokens:700,messages:[{role:'user',content:prompt}]})}}
+  const res=await fetch(url,opt);const d=await res.json().catch(()=>({}));
+  if(!res.ok){const e=d&&d.error;throw new Error((e&&(e.message||(typeof e==='string'?e:'')))||('HTTP '+res.status))}
+  const txt=p.type==='gemini'?d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts&&d.candidates[0].content.parts.map(x=>x.text||'').join(''):p.type==='openai'?d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content:d.content&&d.content[0]&&d.content[0].text;
+  if(!txt)throw new Error('Empty reply from AI');return String(txt).trim();
+}
+function aiAdapter(){
+  if(!S.aiOn||!aiReady())return null;
+  const guard=async f=>{try{return await f()}catch(e){if(e&&e.code==='not_granted'){S.aiOn=false;S.aiNote='AI assist was declined, so templates are used.';paintAi()}throw e}};
+  return{
+    judge:ctx=>guard(async()=>{const t=await withTimeout(askLLM('You are a vendor-onboarding analyst. Policy: a bank account holder name is acceptable if it is clearly the same legal entity as the registered legal name (spelling variant, abbreviation, translation) or a declared trading name of it. It is NOT acceptable if it looks like a different entity, an individual, or a parent or affiliate company.\nRegistered legal name: '+ctx.legal+'\nDeclared trading name: '+(ctx.trading||'none')+'\nBank account holder name: '+ctx.holder+'\nCountry: '+ctx.country+'\nReply with ONLY compact JSON: {"same_entity": true|false, "confidence": number between 0 and 1, "reason": "at most 25 words"}'),30000);const m=/\{[\s\S]*\}/.exec(t);if(!m)throw new Error('AI reply was not JSON');return JSON.parse(m[0])}),
+    draft:ctx=>guard(()=>withTimeout(askLLM('Write a short, courteous email body (max 140 words, plain text, no markdown, no subject line) from a procurement operations team to a prospective vendor contact.\nGreet '+ctx.contact+'. Say we need the items below to finish onboarding '+ctx.vendor+' (ref '+ctx.ref+'). List EVERY item as a line starting with "• ", keeping each item\'s meaning exactly; do not add, drop or soften any. Never mention fraud, risk, scoring or internal systems. Say we will review within 2 business days once everything arrives in a single reply. Sign off "Procurement Operations".\nItems:\n'+ctx.asks.map(a=>'- '+a).join('\n')),30000))
+  };
+}
+function paintAi(){
+  const p=$('#aipill');
+  if(!aiReady()){p.textContent='AI: not set up, templates used';p.className='pill btn';p.title='Open AI settings';return}
+  p.className='pill btn'+(S.aiOn?' on':'');p.textContent='AI: '+PROV[S.prov.type].label+' '+(S.aiOn?'ON':'OFF');
+  p.title=S.aiNote||'AI judges ambiguous names and drafts vendor emails. Everything else is rules.';
+}
+function aiSettings(){
+  const t=S.prov.type,opts=[['none','Off: rules and templates only']].concat(S.aiNs?[['page',PROV.page.label]]:[]).concat([['gemini',PROV.gemini.label],['openai',PROV.openai.label],['anthropic',PROV.anthropic.label]]);
+  const keyed=t!=='none'&&t!=='page';
+  return '<div class="card pad" id="aisettings"><h2>AI assist</h2><p class="sub">Only used for fuzzy name matches and for drafting vendor emails. Rules do everything else.</p><label class="lbl" for="aiprov">Provider</label><select id="aiprov" class="fld">'+opts.map(o=>'<option value="'+o[0]+'"'+(o[0]===t?' selected':'')+'>'+esc(o[1])+'</option>').join('')+'</select>'+
+   (keyed?'<label class="lbl" for="aikey">API key</label><input id="aikey" class="fld" type="password" autocomplete="off" value="'+esc(S.prov.key)+'" placeholder="Paste your key"><label class="lbl" for="aimodel">Model</label><input id="aimodel" class="fld" type="text" value="'+esc(S.prov.model||PROV[t].model)+'"><p class="sub">'+esc(PROV[t].hint)+'. The key stays in this browser tab only.</p>':'')+
+   (t!=='none'?'<div class="row"><button class="ghost" data-act="aitest">Test AI</button><span class="sub" id="aitestout"></span></div>':'')+'</div>';
+}
+
+/* ---------- rendering helpers ---------- */
+const SYM={pass:'OK',warn:'NOTE',fail:'FIX',crit:'STOP',info:'INFO'};
+const pad2=n=>String(n).padStart(2,'0');
+function checkRow(k){
+  const tags=(k.by==='ai'?'<span class="tag ai">AI</span>':'')+(k.status==='fail'?'<span class="tag block">blocks</span>':'')+(k.status==='crit'?'<span class="tag crit">critical</span>':'');
+  return '<li><span class="ci '+k.status+'">'+SYM[k.status]+'</span><div class="ck"><b>'+esc(k.label)+'</b>'+tags+'<p>'+esc(k.detail)+'</p></div></li>';
+}
+function stageDot(st){
+  if(st.state==='running')return '<span class="dot running">'+pad2(st.i+1)+'</span>';
+  if(st.state!=='done')return '<span class="dot">'+pad2(st.i+1)+'</span>';
+  const ck=st.result.checks||[];
+  const w=ck.some(x=>x.status==='crit')?'crit':ck.some(x=>x.status==='fail')?'fail':ck.some(x=>x.status==='warn')?'warn':'pass';
+  return '<span class="dot '+w+'">'+pad2(st.i+1)+'</span>';
+}
+function stageCard(st,run){
+  const d=STAGES[st.i];let body='';
+  if(st.state==='done'){
+    const r=st.result;
+    if(r.checks&&r.checks.length)body+='<ul class="checks">'+r.checks.map(checkRow).join('')+'</ul>';
+    if(r.decision){
+      const dc=r.decision;
+      body+='<div class="verdict '+dc.status+'"><span class="big">'+dc.status+'</span><p>'+esc(dc.headline)+'</p><span class="risk">risk '+dc.risk+'/100</span></div>';
+      if(dc.reasons.length)body+='<ul class="checks">'+dc.reasons.map(x=>checkRow({status:x.status,label:x.label,detail:x.detail})).join('')+'</ul>';
+      const smp=run&&SAMPLES.find(s=>s.id===run.sampleId);
+      if(run&&run.status==='pending'&&smp&&smp.fix)body+='<div class="pad"><button class="ghost" data-act="resub">Load the vendor\'s corrected resubmission</button> <span class="sub">Simulates the vendor replying with everything fixed.</span></div>';
+    }
+    if(r.message){
+      const m=r.message;
+      body+='<div class="sect">Message to vendor</div><div class="mail"><div class="mh"><span><b>'+esc(m.subject)+'</b> <span class="sub">· '+esc(m.by)+'</span></span><button class="ghost" data-act="copy">Copy</button></div><pre id="mailbody">'+esc(m.body)+'</pre></div>';
+      body+='<div class="sect">Internal handoff</div><ul class="acts">'+r.internal.actions.map(a=>'<li>'+esc(a)+'</li>').join('')+'</ul><p class="note">'+esc(r.internal.note)+'</p>';
+    }
+  }
+  const aiPill=st.state==='done'&&((st.result.checks||[]).some(x=>x.by==='ai')||st.result.aiUsed)?'<span class="tag ai">AI used</span>':'';
+  return '<section class="stage" data-state="'+st.state+'" id="st'+st.i+'"><div class="sh">'+stageDot(st)+'<div class="t"><b>'+esc(d.title)+'</b>'+aiPill+'<div>'+esc(st.state==='done'?st.result.summary:d.blurb)+'</div></div>'+(st.state==='done'?'<span class="ms">'+fmtMs(st.result.ms||0)+'</span>':'')+'</div>'+body+'</section>';
+}
+function idleLive(){return{stages:STAGES.map((_,i)=>({i,state:'idle'})),run:null}}
+
+function glance(){
+  try{
+    const s=JSON.parse(S.text);
+    const docs=(s.documents||[]).map(d=>'<span class="chip">'+esc((DOC_TYPES[d.type]||{label:d.type}).label)+'</span>').join('');
+    return '<div class="glance"><span class="chip"><b>'+esc(s.legal_name||'Unnamed')+'</b></span><span class="chip">'+esc(s.country||'?')+'</span><span class="chip mono">'+esc(s.tax_id||'no tax ID')+'</span>'+docs+'</div>';
+  }catch(e){return '<div class="err">Not valid JSON yet. '+esc(e.message)+'</div>'}
+}
+
+/* ---------- views ---------- */
+function viewRun(){
+  const groups=[];SAMPLES.forEach(s=>{const g=s.group.startsWith('Edge')?'Edge cases':s.group;if(!groups.includes(g))groups.push(g)});
+  const samples=groups.map(g=>'<div class="sgroup">'+g+'</div>'+SAMPLES.filter(s=>(s.group.startsWith('Edge')?'Edge cases':s.group)===g).map(s=>'<button class="sample" data-sample="'+s.id+'" aria-pressed="'+(S.loaded===s.id)+'"><b>'+esc(s.title)+'</b> <span style="display:inline;color:var(--accent)">· '+esc(s.tag)+'</span><span>'+esc(s.blurb)+'</span></button>').join('')).join('');
+  const live=S.live||idleLive();
+  return '<div class="grid-run"><div class="rail"><div class="card pad"><h2>Vendor submission</h2><p class="sub">Pick a sample or paste your own JSON from a vendor form.</p><div class="samples">'+samples+'</div></div>'+
+   '<div class="card pad"><h2>Submission</h2><div id="glance">'+glance()+'</div><textarea id="input" spellcheck="false" aria-label="Vendor submission JSON">'+esc(S.text)+'</textarea><div class="row" style="margin-top:10px"><button class="primary" id="runbtn" data-act="run" '+(S.running?'disabled':'')+'>'+(S.running?'Running…':(S.resubOf?'Run resubmission':'Run onboarding'))+'</button><button class="ghost" data-act="format">Format JSON</button></div>'+(S.err?'<div class="err" role="alert">'+esc(S.err)+'</div>':'')+(S.aiNote?'<p class="sub" style="margin-top:8px">'+esc(S.aiNote)+'</p>':'')+'</div>'+aiSettings()+'</div>'+
+   '<div class="stack" id="live" aria-live="polite">'+live.stages.map(st=>stageCard(st,live.run)).join('')+(live.run?'<details><summary>Audit trail ('+live.run.audit.length+' events)</summary><pre class="audit">'+live.run.audit.map(a=>esc(a.t.slice(11,19)+'  '+a.event)).join('\n')+'</pre></details>':'')+'</div></div>';
+}
+function viewDash(){
+  const H=S.history,c=k=>H.filter(r=>r.status===k).length,n=H.length||1;
+  const avg=H.length?H.reduce((a,r)=>a+(r.durationMs||0),0)/H.length:0;
+  const rows=H.filter(r=>(S.filter==='all'||r.status===S.filter)&&(!S.q||(r.vendor+r.ref).toLowerCase().includes(S.q.toLowerCase())));
+  const F=['all','approved','pending','rejected'].map(f=>'<button data-filter="'+f+'" aria-pressed="'+(S.filter===f)+'">'+f[0].toUpperCase()+f.slice(1)+(f==='all'?'':' ('+c(f)+')')+'</button>').join('');
+  return '<div class="kpis"><div class="kpi"><div class="n">'+H.length+'</div><div class="l">Runs</div></div><div class="kpi"><div class="n" style="color:var(--good)">'+c('approved')+'</div><div class="l">Approved</div></div><div class="kpi"><div class="n" style="color:var(--warn)">'+c('pending')+'</div><div class="l">Pending vendor action</div></div><div class="kpi"><div class="n" style="color:var(--bad)">'+c('rejected')+'</div><div class="l">Rejected</div></div><div class="kpi"><div class="n">'+fmtMs(Math.round(avg))+'</div><div class="l">Avg run time</div></div></div>'+
+   '<div class="bar" role="img" aria-label="Status mix"><i class="a" style="width:'+c('approved')/n*100+'%"></i><i class="p" style="width:'+c('pending')/n*100+'%"></i><i class="r" style="width:'+c('rejected')/n*100+'%"></i></div>'+
+   '<div class="filters">'+F+'<input id="q" placeholder="Search vendor or ref" value="'+esc(S.q)+'" style="margin-left:auto;padding:5px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);min-width:0"><button data-act="allsamples" class="ghost">Run all samples</button><button data-act="clear" class="ghost">Clear history</button></div>'+
+   '<div class="card tablewrap">'+(rows.length?'<table><thead><tr><th>Ref</th><th>Vendor</th><th>Country</th><th>Status</th><th>Risk</th><th>Open items</th><th>AI</th><th>Run</th></tr></thead><tbody>'+rows.map(r=>'<tr class="clickable" tabindex="0" data-open="'+esc(r.id)+'"><td class="ms">'+esc(r.ref)+(r.resubmissionOf?'<br>↻ '+esc(r.resubmissionOf):'')+'</td><td><b>'+esc(r.vendor)+'</b><div class="sub">'+esc(r.decision.headline||'')+'</div></td><td>'+esc(r.country)+'</td><td><span class="badge '+r.status+'">'+r.status+'</span></td><td>'+r.risk+'</td><td>'+r.issues+'</td><td>'+(r.aiUsed?'<span class="tag ai">AI</span>':'-')+'</td><td class="ms">'+esc(fmtT(r.at))+'<br>'+fmtMs(r.durationMs)+(r.example?' · sample':'')+'</td></tr>').join('')+'</tbody></table>':'<div class="empty">No runs match. Run a submission, or load the samples.</div>')+'</div>';
+}
+function viewMap(){
+  const ai={4:'',3:'AI judges ambiguous name matches',6:'AI drafts the email to the vendor (templates as fallback)'};
+  const rules={
+    0:['Parse JSON; tidy spacing, case and hyphens in IDs','Assign reference; link resubmissions to the original'],
+    1:['Required fields differ by country (e.g. IFSC for India, ABA routing for US, IBAN for UK/DE)','Required documents differ by country; a document for another country is flagged as wrong, not just missing','Expired documents and bank proof older than 90 days are treated as missing'],
+    2:['India: GSTIN pattern + checksum, PAN, IFSC. US: EIN, ABA routing checksum. UK/DE: VAT format, IBAN mod-97','A valid ID for the wrong country is called out as such'],
+    3:['Bank holder vs legal name after normalising accents, "&"/"und", punctuation and legal suffixes','Name and ID on every document vs the form','India: GSTIN contains PAN, GSTIN state vs address, PAN type vs company name','Bank country, IBAN country, free-mail contact'],
+    4:['Watchlist (demo list), tax ID and bank account vs vendor master','Same account under a different vendor = critical','Existing vendor changing bank details = call-back verification'],
+    5:['Any critical flag → Rejected','Any blocking gap or inconsistency → Pending','Otherwise → Approved (warnings become notes)'],
+    6:['Pending: one consolidated request, never a drip of follow-ups','Rejected: fixed neutral wording; reasons stay internal','Approved: welcome note and ERP handoff']
+  };
+  return '<div class="two"><div><h2>How a submission flows</h2><p class="sub" style="margin-bottom:12px">Rules decide anything that can be checked. AI is only used where a human would use judgement.</p><div class="map">'+STAGES.map((s,i)=>'<div class="mstep"><div class="mnum">'+pad2(i+1)+'</div><div><b>'+esc(s.title)+'</b>'+(ai[i]?' <span class="tag ai">'+esc(ai[i])+'</span>':'')+'<ul>'+rules[i].map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div></div>').join('')+'</div></div>'+
+   '<div class="stack"><div class="card pad"><h2>Decision rubric</h2><table><tbody><tr><td><span class="badge approved">approved</span></td><td>No blocking gaps or inconsistencies. Warnings are recorded as notes.</td></tr><tr><td><span class="badge pending">pending</span></td><td>Fixable by the vendor. They get one list of everything needed.</td></tr><tr><td><span class="badge rejected">rejected</span></td><td>Fraud or compliance signal. Vendor is not told which control fired.</td></tr></tbody></table></div>'+
+   '<div class="card pad"><h2>Edge cases built</h2><ol style="margin:6px 0 0;padding-left:18px"><li><b>Same entity, spelled differently</b> (Müller &amp; Söhne; Brightwell trading name). Avoids rejecting honest vendors; AI judges the grey zone.</li><li><b>Valid IDs that disagree</b> (GSTIN embeds a different PAN, wrong state). Format checks pass; cross-checks catch it.</li><li><b>Wrong, missing and stale documents</b> (Aarav). One consolidated ask, then a resubmission that clears.</li><li><b>Fraud pattern</b> (Zenith). Everything well-formed, but the bank account is another vendor\'s.</li><li><b>Bank change on a known vendor</b> (Lakeshore). Call-back verification, look-alike domain flagged.</li></ol></div>'+
+   '<div class="card pad"><h2>Assumptions</h2><ul style="margin:6px 0 0;padding-left:18px;color:var(--muted)"><li>Documents arrive as structured fields (type, name, ID, dates), as if already read by OCR. Reading raw PDFs is the next step.</li><li>Four countries are supported: IN, US, GB, DE.</li><li>Vendor master and watchlist are small demo datasets held in the page.</li><li>Emails are drafted, not sent. A human sends them.</li><li>Run history is stored in this browser only.</li></ul></div></div></div>';
+}
+
+function render(keepScroll){
+  const y=window.scrollY;
+  $('#app').innerHTML=S.view==='run'?viewRun():S.view==='dash'?viewDash():viewMap();
+  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.view===S.view));
+  $('#cnt').textContent=S.history.length;
+  if(keepScroll)window.scrollTo(0,y);
+}
+
+/* ---------- actions ---------- */
+async function execute(text,opts={}){
+  S.running=true;S.err='';
+  S.live={stages:STAGES.map((_,i)=>({i,state:'idle'})),run:null};
+  render(true);
+  try{
+    const run=await runPipeline(text,{delay:opts.delay??420,ai:opts.noAi?null:aiAdapter(),resubmissionOf:opts.resubOf,ref:opts.ref,
+      onStageStart:i=>{S.live.stages[i].state='running';if(S.view==='run'){render(true);const el=document.getElementById('st'+i);if(el&&opts.scroll!==false)el.scrollIntoView({block:'nearest',behavior:'smooth'})}},
+      onStageDone:(i,r)=>{S.live.stages[i]={i,state:'done',result:r};if(S.view==='run')render(true)}});
+    run.sampleId=opts.sampleId||null;run.example=!!opts.example;
+    S.live.run=run;S.history.unshift(run);saveHist();
+    if(opts.aiErr!==false&&run.aiError)S.aiNote='AI call failed ('+run.aiError+'); templates used for that step.';
+    return run;
+  }catch(e){S.err=e.message;S.live=null;return null}
+  finally{S.running=false;if(S.view==='run')render(true);else render()}
+}
+async function seed(){
+  const H=[];
+  for(const s of SAMPLES){
+    const r=await runPipeline(JSON.stringify(s.build()),{delay:0,ai:null});
+    r.sampleId=s.id;r.example=true;r.at=new Date(Date.now()-(SAMPLES.length-H.length)*3600e3).toISOString();H.push(r);
+  }
+  return H.reverse();
+}
+function pick(id){
+  const s=SAMPLES.find(x=>x.id===id);if(!s)return;
+  S.loaded=id;S.text=JSON.stringify(s.build(),null,2);S.live=null;S.err='';S.resubOf=null;render();
+}
+document.addEventListener('click',async e=>{
+  const t=e.target.closest('[data-view],[data-sample],[data-act],[data-filter],[data-open]');if(!t)return;
+  if(t.dataset.view){S.view=t.dataset.view;render();window.scrollTo(0,0);return}
+  if(t.dataset.sample){pick(t.dataset.sample);return}
+  if(t.dataset.filter){S.filter=t.dataset.filter;render(true);return}
+  if(t.dataset.open){const r=S.history.find(x=>x.id===t.dataset.open);if(r)openRun(r);return}
+  const a=t.dataset.act;
+  if(a==='run'){
+    const ta=$('#input');if(ta)S.text=ta.value;
+    const run=await execute(S.text,{sampleId:S.loaded,resubOf:S.resubOf,ref:S.resubOf?S.resubOf+'-R':undefined});
+    S.resubOf=null;if(run)toast('Run complete: '+run.status);
+  }
+  if(a==='aitest'){const out=$('#aitestout');out.textContent='Testing...';try{const t=await withTimeout(askLLM('Reply with exactly the word: OK'),20000);out.textContent='Works. Reply: '+t.slice(0,30);S.aiOn=true;paintAi()}catch(x){out.textContent='Failed: '+(x.message||x)+'. Check the key and model name.'}}
+  if(a==='format'){try{S.text=JSON.stringify(JSON.parse($('#input').value),null,2);S.err='';render(true)}catch(x){S.err='Cannot format: '+x.message;render(true)}}
+  if(a==='resub'){
+    const run=S.live&&S.live.run;const smp=run&&SAMPLES.find(s=>s.id===run.sampleId);
+    if(smp&&smp.fix){S.text=JSON.stringify(smp.fix(),null,2);S.resubOf=run.ref;S.live=null;render();window.scrollTo(0,0);toast('Corrected data loaded. Press Run resubmission.')}
+  }
+  if(a==='copy'){const txt=($('#mailbody')||{}).textContent||'';try{await navigator.clipboard.writeText(txt);toast('Copied')}catch(x){const r=document.createRange();r.selectNodeContents($('#mailbody'));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('Press Ctrl/Cmd+C to copy')}}
+  if(a==='allsamples'){S.history=[...(await seed()),...S.history];seedRefCounter(S.history.map(r=>r.ref));saveHist();render();toast('Sample runs added')}
+  if(a==='clear'){S.history=[];saveHist();render()}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'){const t=e.target.closest('[data-open]');if(t){const r=S.history.find(x=>x.id===t.dataset.open);if(r)openRun(r)}}});
+document.addEventListener('input',e=>{
+  if(e.target.id==='input'){S.text=e.target.value;S.loaded=null;S.resubOf=S.resubOf;const g=$('#glance');if(g)g.innerHTML=glance()}
+  if(e.target.id==='aikey'){S.prov.key=e.target.value.trim();S.aiOn=aiReady();saveProv();paintAi()}
+  if(e.target.id==='aimodel'){S.prov.model=e.target.value.trim();saveProv()}
+  if(e.target.id==='q'){S.q=e.target.value;const pos=e.target.selectionStart;render(true);const q=$('#q');q.focus();q.setSelectionRange(pos,pos)}
+});
+function openRun(r){
+  S.view='run';S.text=JSON.stringify(r.input,null,2);S.loaded=r.sampleId||null;S.err='';S.resubOf=null;
+  S.live={stages:r.stages.map((res,i)=>({i,state:'done',result:res})),run:r};render();window.scrollTo(0,0);
+}
+$('#aipill').addEventListener('click',()=>{
+  if(!aiReady()){S.view='run';render();const el=$('#aisettings');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});return}
+  S.aiOn=!S.aiOn;S.aiNote='';paintAi();render(true)});
+document.addEventListener('change',e=>{
+  if(e.target.id==='aiprov'){S.prov={type:e.target.value,key:'',model:''};S.aiOn=aiReady();S.aiNote='';saveProv();paintAi();render(true)}
+});
+
+/* ---------- boot ---------- */
+(async function boot(){
+  S.history=loadHist();seedRefCounter(S.history.map(r=>r.ref));
+  pick('kestrel');
+  if(!S.history.length){S.history=await seed();saveHist()}
+  seedRefCounter(S.history.map(r=>r.ref));
+  render();
+  try{
+    const c=window.claude;
+    if(c&&c.use){S.aiNs=await c.use('sample')}
+  }catch(e){S.aiNs=null}
+  loadProv();
+  if(S.prov.type==='none'&&S.aiNs)S.prov={type:'page',key:'',model:''};
+  if(S.prov.type==='page'&&!S.aiNs)S.prov={type:'none',key:'',model:''};
+  S.aiOn=aiReady();
+  paintAi();render(true);
+})();
+</script>
+
+</body></html>
